@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RideEasy — Universal Transport Ticketing</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1A73E8;
+    --blue-dark: #1557B0;
+    --blue-light: #E8F0FE;
+    --green: #34A853;
+    --green-light: #E6F4EA;
+    --red: #EA4335;
+    --yellow: #FBBC04;
+    --bg: #F8F9FA;
+    --white: #FFFFFF;
+    --text: #1E1E1E;
+    --text-soft: #5F6368;
+    --text-lighter: #9AA0A6;
+    --card: #FFFFFF;
+    --border: #E8EAED;
+    --shadow: 0 2px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(26,115,232,0.18);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-pill: 50px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #1E1E2E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* PHONE WRAPPER */
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+  }
+
+  /* SCREENS */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: var(--bg);
+    animation: slideIn 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .screen.active { display: flex; }
+
+  @keyframes slideIn {
+    from { transform: translateX(60px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes slideBack {
+    from { transform: translateX(-60px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  .screen.back { animation: slideBack 0.35s cubic-bezier(0.4,0,0.2,1); }
+
+  /* ===================== SCREEN 1: HOME ===================== */
+  .s1-header {
+    background: linear-gradient(135deg, #1A73E8 0%, #0D47A1 100%);
+    padding: 52px 24px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .s1-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .s1-header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 30px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .s1-toprow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .s1-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .s1-brand-icon {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .s1-brand-name {
+    color: white;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .lang-row {
+    display: flex;
+    gap: 6px;
+  }
+  .lang-btn {
+    width: 36px; height: 28px;
+    border-radius: 6px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lang-btn.active, .lang-btn:hover { border-color: white; background: rgba(255,255,255,0.25); }
+  .s1-greeting { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 400; margin-bottom: 4px; }
+  .s1-title { color: white; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+
+  .s1-body { padding: 20px 20px 100px; flex: 1; }
+
+  /* Quick routes */
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-lighter);
+    margin-bottom: 12px;
+    margin-top: 20px;
+  }
+
+  .search-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .input-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    gap: 12px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background 0.15s;
+  }
+  .input-row:hover { background: var(--bg); }
+  .input-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-from { background: var(--blue); }
+  .dot-to { background: var(--green); }
+  .input-text { font-size: 16px; color: var(--text-lighter); flex: 1; }
+  .input-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 14px;
+    position: relative;
+  }
+  .swap-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px; height: 32px;
+    background: var(--blue-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  .swap-btn:hover { transform: translateY(-50%) rotate(180deg); }
+
+  .transport-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .transport-card {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 14px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .transport-card:hover, .transport-card.selected {
+    border-color: var(--blue);
+    background: var(--blue-light);
+  }
+  .transport-card .icon { font-size: 26px; }
+  .transport-card .label { font-size: 11px; font-weight: 600; color: var(--text-soft); text-align: center; }
+
+  .recent-list { display: flex; flex-direction: column; gap: 8px; }
+  .recent-item {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    transition: transform 0.15s;
+  }
+  .recent-item:hover { transform: translateX(4px); }
+  .recent-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .ri-bus { background: #E8F0FE; }
+  .ri-train { background: #E6F4EA; }
+  .ri-metro { background: #FFF3E0; }
+  .recent-info { flex: 1; }
+  .recent-route { font-size: 14px; font-weight: 600; color: var(--text); }
+  .recent-time { font-size: 12px; color: var(--text-lighter); margin-top: 2px; }
+  .recent-price { font-size: 14px; font-weight: 700; color: var(--blue); }
+
+  .go-btn {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 350px;
+    height: 60px;
+    background: linear-gradient(135deg, #1A73E8, #0D47A1);
+    border: none;
+    border-radius: var(--radius-pill);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .go-btn:hover { transform: translateX(-50%) translateY(-2px); box-shadow: 0 12px 40px rgba(26,115,232,0.3); }
+  .go-btn:active { transform: translateX(-50%) translateY(0); }
+
+  /* ===================== SCREEN 2: ROUTE SELECTION ===================== */
+  .s2-header {
+    background: white;
+    padding: 52px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .back-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .back-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .back-icon:hover { background: var(--blue-light); }
+  .page-title { font-size: 20px; font-weight: 700; color: var(--text); }
+
+  .route-input-box {
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 6px;
+  }
+  .route-input-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .route-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .route-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+  }
+  .route-input::placeholder { color: var(--text-lighter); }
+  .route-line { width: 1px; height: 16px; background: var(--border); margin-left: 17px; }
+
+  .s2-body { padding: 16px 20px; flex: 1; }
+
+  .suggest-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .suggest-card {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  .suggest-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+  .suggest-icon { font-size: 24px; margin-bottom: 6px; }
+  .suggest-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .suggest-dist { font-size: 11px; color: var(--text-lighter); margin-top: 2px; }
+
+  .route-result {
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+  .route-result-header {
+    padding: 14px 16px;
+    background: var(--blue-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .route-number { font-size: 18px; font-weight: 700; color: var(--blue); }
+  .route-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-fast { background: #E6F4EA; color: var(--green); }
+  .badge-cheap { background: #FFF3E0; color: #E65100; }
+  .badge-direct { background: var(--blue-light); color: var(--blue); }
+  .route-result-body { padding: 14px 16px; }
+  .route-stops {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .stop-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .stop-arrow { color: var(--text-lighter); font-size: 14px; }
+  .route-meta {
+    display: flex;
+    gap: 16px;
+  }
+  .route-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+
+  /* ===================== SCREEN 3: TICKET OPTIONS ===================== */
+  .s3-header {
+    background: linear-gradient(135deg, #1A73E8 0%, #0D47A1 100%);
+    padding: 52px 20px 24px;
+  }
+  .s3-route-pill {
+    background: rgba(255,255,255,0.15);
+    border-radius: 30px;
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .s3-route-pill span { color: white; font-size: 13px; font-weight: 500; }
+  .s3-title { color: white; font-size: 24px; font-weight: 700; }
+  .s3-subtitle { color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 4px; }
+
+  .s3-body { padding: 20px; flex: 1; }
+
+  .option-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .option-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 12px;
+  }
+
+  /* Journey type toggle */
+  .toggle-group {
+    display: flex;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .toggle-btn.active {
+    background: white;
+    color: var(--blue);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* Passenger counter */
+  .passenger-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+  .passenger-info { display: flex; align-items: center; gap: 10px; }
+  .passenger-icon { font-size: 22px; }
+  .passenger-type { font-size: 15px; font-weight: 600; color: var(--text); }
+  .passenger-hint { font-size: 12px; color: var(--text-lighter); }
+  .counter-row { display: flex; align-items: center; gap: 14px; }
+  .counter-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: white;
+    font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--blue);
+    font-weight: 700;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .counter-btn:hover { border-color: var(--blue); background: var(--blue-light); }
+  .counter-num { font-size: 20px; font-weight: 700; color: var(--text); width: 24px; text-align: center; }
+  .passenger-divider { height: 1px; background: var(--border); margin: 10px 0; }
+
+  /* Date selector */
+  .date-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .date-chip {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 2px solid var(--border);
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .date-chip.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+  .date-chip .day { font-size: 11px; display: block; }
+  .date-chip .num { font-size: 16px; font-weight: 700; display: block; }
+
+  /* Price summary */
+  .price-box {
+    background: var(--blue-light);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+  .price-label { font-size: 14px; color: var(--blue); font-weight: 500; }
+  .price-amount { font-size: 26px; font-weight: 700; color: var(--blue); font-family: 'DM Mono', monospace; }
+
+  /* ===================== SCREEN 4: PAYMENT ===================== */
+  .s4-header {
+    background: white;
+    padding: 52px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .s4-body { padding: 20px; flex: 1; }
+
+  .summary-card {
+    background: linear-gradient(135deg, #1A73E8, #0D47A1);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    color: white;
+  }
+  .summary-route {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .summary-stop { font-size: 16px; font-weight: 700; }
+  .summary-arrow { font-size: 20px; opacity: 0.7; }
+  .summary-details {
+    display: flex;
+    gap: 20px;
+  }
+  .summary-item { }
+  .summary-item-label { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
+  .summary-item-value { font-size: 15px; font-weight: 600; margin-top: 2px; }
+
+  .payment-methods { margin-bottom: 20px; }
+  .pay-option {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: all 0.2s;
+  }
+  .pay-option.active { border-color: var(--blue); background: var(--blue-light); }
+  .pay-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .pi-card { background: #E8F0FE; }
+  .pi-upi { background: #E6F4EA; }
+  .pi-cash { background: #FFF3E0; }
+  .pi-wallet { background: #FCE4EC; }
+  .pay-info { flex: 1; }
+  .pay-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .pay-hint { font-size: 12px; color: var(--text-lighter); margin-top: 2px; }
+  .pay-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .pay-option.active .pay-check { background: var(--blue); border-color: var(--blue); color: white; }
+
+  .total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .total-label { font-size: 16px; font-weight: 600; color: var(--text); }
+  .total-amount { font-size: 28px; font-weight: 700; color: var(--text); font-family: 'DM Mono', monospace; }
+
+  .pay-btn {
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(135deg, #34A853, #1B7A38);
+    border: none;
+    border-radius: var(--radius-pill);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+    box-shadow: 0 8px 24px rgba(52,168,83,0.3);
+  }
+  .pay-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(52,168,83,0.4); }
+
+  /* ===================== SCREEN 5: CONFIRMATION ===================== */
+  .s5-body {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+
+  .s5-top {
+    background: linear-gradient(135deg, #34A853, #1B7A38);
+    width: 100%;
+    padding: 52px 20px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .success-ring {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    margin-bottom: 16px;
+    animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+  }
+  @keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .s5-title { color: white; font-size: 26px; font-weight: 700; }
+  .s5-subtitle { color: rgba(255,255,255,0.8); font-size: 14px; margin-top: 6px; }
+
+  .ticket-card {
+    background: white;
+    border-radius: var(--radius);
+    width: calc(100% - 40px);
+    margin: -24px 20px 0;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    overflow: hidden;
+    position: relative;
+  }
+  .ticket-notch {
+    position: absolute;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--bg);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .notch-left { left: -12px; }
+  .notch-right { right: -12px; }
+  .ticket-top { padding: 20px; }
+  .ticket-route {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .ticket-stop { text-align: center; }
+  .ticket-stop-code { font-size: 24px; font-weight: 800; color: var(--text); font-family: 'DM Mono', monospace; }
+  .ticket-stop-name { font-size: 11px; color: var(--text-lighter); margin-top: 2px; }
+  .ticket-route-mid {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 10px;
+  }
+  .route-line-thin { flex: 1; height: 1px; background: var(--border); }
+  .route-bus-icon { font-size: 20px; }
+  .ticket-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .ticket-meta-item { text-align: center; }
+  .ticket-meta-label { font-size: 10px; color: var(--text-lighter); text-transform: uppercase; letter-spacing: 0.5px; }
+  .ticket-meta-value { font-size: 14px; font-weight: 700; color: var(--text); margin-top: 3px; }
+  .ticket-divider {
+    border: none;
+    border-top: 2px dashed var(--border);
+    margin: 0 16px;
+  }
+  .ticket-bottom {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .qr-container {
+    width: 160px; height: 160px;
+    background: var(--bg);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+    padding: 8px;
+  }
+  .qr-container svg { width: 100%; height: 100%; }
+  .ticket-id { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-lighter); }
+
+  .s5-actions {
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .action-btn {
+    width: 100%;
+    height: 52px;
+    border-radius: var(--radius-pill);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary { background: var(--blue); color: white; box-shadow: 0 4px 16px rgba(26,115,232,0.3); }
+  .btn-secondary { background: white; color: var(--text); border: 2px solid var(--border); }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+
+  /* Nav dots */
+  .nav-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+  }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 3px;
+    background: rgba(0,0,0,0.15);
+    transition: all 0.3s;
+  }
+  .nav-dot.active { width: 18px; background: var(--blue); }
+
+  /* Scrollbar hide */
+  .screen::-webkit-scrollbar { display: none; }
+  .screen { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Info text outside phone */
+  .info-text {
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    margin-top: 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div style="display:flex;flex-direction:column;align-items:center;">
+<div class="phone">
+
+  <!-- ===== SCREEN 1: HOME ===== -->
+  <div class="screen active" id="s1">
+    <div class="s1-header">
+      <div class="s1-toprow">
+        <div class="s1-brand">
+          <div class="s1-brand-icon">🚌</div>
+          <span class="s1-brand-name">RideEasy</span>
+        </div>
+        <div class="lang-row">
+          <div class="lang-btn active" title="English">🇬🇧</div>
+          <div class="lang-btn" title="Hindi">🇮🇳</div>
+          <div class="lang-btn" title="Spanish">🇪🇸</div>
+        </div>
+      </div>
+      <div class="s1-greeting">Good morning 👋</div>
+      <div class="s1-title">Where are you going?</div>
+    </div>
+
+    <div class="s1-body">
+      <!-- Search card -->
+      <div class="search-card" style="margin-top:4px;">
+        <div class="input-row" onclick="goTo('s2')">
+          <div class="input-dot dot-from"></div>
+          <span class="input-text">From where?</span>
+          <span style="font-size:18px;">📍</span>
+        </div>
+        <div class="input-divider">
+          <div class="swap-btn">⇅</div>
+        </div>
+        <div class="input-row" onclick="goTo('s2')">
+          <div class="input-dot dot-to"></div>
+          <span class="input-text">To where?</span>
+          <span style="font-size:18px;">🔍</span>
+        </div>
+      </div>
+
+      <!-- Transport type -->
+      <div class="section-label">Choose Transport</div>
+      <div class="transport-grid">
+        <div class="transport-card selected" onclick="selectTransport(this)">
+          <span class="icon">🚌</span>
+          <span class="label">Bus</span>
+        </div>
+        <div class="transport-card" onclick="selectTransport(this)">
+          <span class="icon">🚆</span>
+          <span class="label">Train</span>
+        </div>
+        <div class="transport-card" onclick="selectTransport(this)">
+          <span class="icon">🚇</span>
+          <span class="label">Metro</span>
+        </div>
+        <div class="transport-card" onclick="selectTransport(this)">
+          <span class="icon">⛴️</span>
+          <span class="label">Ferry</span>
+        </div>
+      </div>
+
+      <!-- Recent routes -->
+      <div class="section-label">Recent Routes</div>
+      <div class="recent-list">
+        <div class="recent-item" onclick="goTo('s2')">
+          <div class="recent-icon ri-bus">🚌</div>
+          <div class="recent-info">
+            <div class="recent-route">Central Park → Airport</div>
+            <div class="recent-time">Bus 42 · 35 min</div>
+          </div>
+          <div class="recent-price">₹45</div>
+        </div>
+        <div class="recent-item" onclick="goTo('s2')">
+          <div class="recent-icon ri-train">🚆</div>
+          <div class="recent-info">
+            <div class="recent-route">City Hall → Suburbs</div>
+            <div class="recent-time">Train 7 · 18 min</div>
+          </div>
+          <div class="recent-price">₹30</div>
+        </div>
+        <div class="recent-item" onclick="goTo('s2')">
+          <div class="recent-icon ri-metro">🚇</div>
+          <div class="recent-info">
+            <div class="recent-route">Market → University</div>
+            <div class="recent-time">Metro Line 2 · 12 min</div>
+          </div>
+          <div class="recent-price">₹20</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="go-btn" onclick="goTo('s2')">
+      <span>🔍</span> Search Routes
+    </button>
+  </div>
+
+  <!-- ===== SCREEN 2: ROUTE SELECTION ===== -->
+  <div class="screen" id="s2">
+    <div class="s2-header">
+      <div class="back-row">
+        <div class="back-icon" onclick="goBack('s1')">←</div>
+        <span class="page-title">Choose Route</span>
+      </div>
+      <div class="route-input-box">
+        <div class="route-input-row">
+          <div class="route-dot" style="background:var(--blue)"></div>
+          <input class="route-input" placeholder="From: Central Station" value="Central Station" />
+        </div>
+        <div class="route-line"></div>
+        <div class="route-input-row">
+          <div class="route-dot" style="background:var(--green)"></div>
+          <input class="route-input" placeholder="To: Airport Terminal" value="Airport Terminal" />
+        </div>
+      </div>
+    </div>
+
+    <div class="s2-body">
+      <!-- Landmark quick picks -->
+      <div class="section-label">Popular Destinations</div>
+      <div class="suggest-grid">
+        <div class="suggest-card" onclick="selectDest(this,'✈️','Airport')">
+          <div class="suggest-icon">✈️</div>
+          <div class="suggest-name">Airport</div>
+          <div class="suggest-dist">12 km away</div>
+        </div>
+        <div class="suggest-card" onclick="selectDest(this,'🏥','Hospital')">
+          <div class="suggest-icon">🏥</div>
+          <div class="suggest-name">Hospital</div>
+          <div class="suggest-dist">3.2 km away</div>
+        </div>
+        <div class="suggest-card" onclick="selectDest(this,'🎓','University')">
+          <div class="suggest-icon">🎓</div>
+          <div class="suggest-name">University</div>
+          <div class="suggest-dist">5.5 km away</div>
+        </div>
+        <div class="suggest-card" onclick="selectDest(this,'🛒','Market')">
+          <div class="suggest-icon">🛒</div>
+          <div class="suggest-name">Market</div>
+          <div class="suggest-dist">1.8 km away</div>
+        </div>
+      </div>
+
+      <!-- Available routes -->
+      <div class="section-label">Available Routes</div>
+
+      <div class="route-result" onclick="goTo('s3')">
+        <div class="route-result-header">
+          <span class="route-number">🚌 Bus 42</span>
+          <span class="route-badge badge-fast">⚡ Fastest</span>
+        </div>
+        <div class="route-result-body">
+          <div class="route-stops">
+            <span class="stop-name">Central Stn</span>
+            <span class="stop-arrow">→</span>
+            <span class="stop-name">MG Road</span>
+            <span class="stop-arrow">→</span>
+            <span class="stop-name">Airport</span>
+          </div>
+          <div class="route-meta">
+            <div class="route-meta-item">⏱ 35 min</div>
+            <div class="route-meta-item">🛑 3 stops</div>
+            <div class="route-meta-item" style="color:var(--blue);font-weight:700;">₹45</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="route-result" onclick="goTo('s3')">
+        <div class="route-result-header">
+          <span class="route-number">🚆 Train 7</span>
+          <span class="route-badge badge-cheap">💰 Cheapest</span>
+        </div>
+        <div class="route-result-body">
+          <div class="route-stops">
+            <span class="stop-name">Central Stn</span>
+            <span class="stop-arrow">→</span>
+            <span class="stop-name">Jn. Road</span>
+            <span class="stop-arrow">→</span>
+            <span class="stop-name">Airport</span>
+          </div>
+          <div class="route-meta">
+            <div class="route-meta-item">⏱ 48 min</div>
+            <div class="route-meta-item">🛑 2 stops</div>
+            <div class="route-meta-item" style="color:var(--blue);font-weight:700;">₹30</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="route-result" onclick="goTo('s3')">
+        <div class="route-result-header">
+          <span class="route-number">🚇 Metro L2</span>
+          <span class="route-badge badge-direct">🎯 Direct</span>
+        </div>
+        <div class="route-result-body">
+          <div class="route-stops">
+            <span class="stop-name">Central Stn</span>
+            <span class="stop-arrow">→</span>
+            <span class="stop-name">Airport</span>
+          </div>
+          <div class="route-meta">
+            <div class="route-meta-item">⏱ 22 min</div>
+            <div class="route-meta-item">🛑 1 stop</div>
+            <div class="route-meta-item" style="color:var(--blue);font-weight:700;">₹60</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 3: TICKET OPTIONS ===== -->
+  <div class="screen" id="s3">
+    <div class="s3-header">
+      <div class="back-row" style="margin-bottom:12px;">
+        <div class="back-icon" style="background:rgba(255,255,255,0.15);" onclick="goBack('s2')">←</div>
+        <span style="color:white;font-size:18px;font-weight:600;">Ticket Options</span>
+      </div>
+      <div class="s3-route-pill">
+        <span>🚌</span>
+        <span>Central Station → Airport · Bus 42</span>
+      </div>
+      <div class="s3-title">Customize Your Ticket</div>
+      <div class="s3-subtitle">Select passengers, date & journey type</div>
+    </div>
+
+    <div class="s3-body">
+
+      <!-- Journey type -->
+      <div class="option-card">
+        <div class="option-title">Journey Type</div>
+        <div class="toggle-group">
+          <button class="toggle-btn active" onclick="selectToggle(this)">
+            ➡️ One Way
+          </button>
+          <button class="toggle-btn" onclick="selectToggle(this)">
+            🔄 Return
+          </button>
+          <button class="toggle-btn" onclick="selectToggle(this)">
+            📅 Pass
+          </button>
+        </div>
+      </div>
+
+      <!-- Date selector -->
+      <div class="option-card">
+        <div class="option-title">Travel Date</div>
+        <div class="date-row" id="dateRow"></div>
+      </div>
+
+      <!-- Passengers -->
+      <div class="option-card">
+        <div class="option-title">Passengers</div>
+        <div class="passenger-row">
+          <div class="passenger-info">
+            <span class="passenger-icon">🧑</span>
+            <div>
+              <div class="passenger-type">Adult</div>
+              <div class="passenger-hint">Age 13+</div>
+            </div>
+          </div>
+          <div class="counter-row">
+            <button class="counter-btn" onclick="changeCount('adult',-1)">−</button>
+            <span class="counter-num" id="adultCount">1</span>
+            <button class="counter-btn" onclick="changeCount('adult',1)">+</button>
+          </div>
+        </div>
+        <div class="passenger-divider"></div>
+        <div class="passenger-row">
+          <div class="passenger-info">
+            <span class="passenger-icon">👶</span>
+            <div>
+              <div class="passenger-type">Child</div>
+              <div class="passenger-hint">Age 5–12 · 50% off</div>
+            </div>
+          </div>
+          <div class="counter-row">
+            <button class="counter-btn" onclick="changeCount('child',-1)">−</button>
+            <span class="counter-num" id="childCount">0</span>
+            <button class="counter-btn" onclick="changeCount('child',1)">+</button>
+          </div>
+        </div>
+        <div class="passenger-divider"></div>
+        <div class="passenger-row">
+          <div class="passenger-info">
+            <span class="passenger-icon">👴</span>
+            <div>
+              <div class="passenger-type">Senior</div>
+              <div class="passenger-hint">Age 60+ · 40% off</div>
+            </div>
+          </div>
+          <div class="counter-row">
+            <button class="counter-btn" onclick="changeCount('senior',-1)">−</button>
+            <span class="counter-num" id="seniorCount">0</span>
+            <button class="counter-btn" onclick="changeCount('senior',1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="price-box">
+        <div>
+          <div class="price-label">Total Price</div>
+          <div style="font-size:11px;color:var(--blue);opacity:0.7;margin-top:2px;">All passengers included</div>
+        </div>
+        <div class="price-amount" id="totalPrice">₹45</div>
+      </div>
+
+      <button class="go-btn" style="position:relative;bottom:auto;left:auto;transform:none;width:100%;margin-top:16px;" onclick="goTo('s4')">
+        Continue to Payment →
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 4: PAYMENT ===== -->
+  <div class="screen" id="s4">
+    <div class="s4-header">
+      <div class="back-row">
+        <div class="back-icon" onclick="goBack('s3')">←</div>
+        <span class="page-title">Payment</span>
+      </div>
+    </div>
+
+    <div class="s4-body">
+      <!-- Summary card -->
+      <div class="summary-card">
+        <div class="summary-route">
+          <div>
+            <div style="font-size:11px;opacity:0.7;">FROM</div>
+            <div class="summary-stop">Central Station</div>
+          </div>
+          <div class="summary-arrow">✈</div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;opacity:0.7;">TO</div>
+            <div class="summary-stop">Airport</div>
+          </div>
+        </div>
+        <div class="summary-details">
+          <div class="summary-item">
+            <div class="summary-item-label">Transport</div>
+            <div class="summary-item-value">🚌 Bus 42</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-label">Passengers</div>
+            <div class="summary-item-value" id="s4Passengers">1 Adult</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-label">Date</div>
+            <div class="summary-item-value">Today</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment methods -->
+      <div class="section-label">Pay With</div>
+      <div class="payment-methods">
+        <div class="pay-option active" onclick="selectPay(this)">
+          <div class="pay-icon pi-card">💳</div>
+          <div class="pay-info">
+            <div class="pay-name">Credit / Debit Card</div>
+            <div class="pay-hint">Visa, Mastercard, Rupay</div>
+          </div>
+          <div class="pay-check">✓</div>
+        </div>
+        <div class="pay-option" onclick="selectPay(this)">
+          <div class="pay-icon pi-upi">📱</div>
+          <div class="pay-info">
+            <div class="pay-name">UPI / QR Pay</div>
+            <div class="pay-hint">GPay, PhonePe, Paytm</div>
+          </div>
+          <div class="pay-check"></div>
+        </div>
+        <div class="pay-option" onclick="selectPay(this)">
+          <div class="pay-icon pi-wallet">👛</div>
+          <div class="pay-info">
+            <div class="pay-name">RideEasy Wallet</div>
+            <div class="pay-hint">Balance: ₹200</div>
+          </div>
+          <div class="pay-check"></div>
+        </div>
+        <div class="pay-option" onclick="selectPay(this)">
+          <div class="pay-icon pi-cash">💵</div>
+          <div class="pay-info">
+            <div class="pay-name">Cash on Board</div>
+            <div class="pay-hint">Pay to conductor</div>
+          </div>
+          <div class="pay-check"></div>
+        </div>
+      </div>
+
+      <div class="total-row">
+        <span class="total-label">Total Amount</span>
+        <span class="total-amount" id="s4Total">₹45</span>
+      </div>
+
+      <button class="pay-btn" onclick="goTo('s5')">
+        🔒 Pay Securely
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 5: CONFIRMATION ===== -->
+  <div class="screen" id="s5">
+    <div class="s5-body">
+      <div class="s5-top">
+        <div class="success-ring">✅</div>
+        <div class="s5-title">Ticket Booked!</div>
+        <div class="s5-subtitle">Show QR code to the conductor</div>
+      </div>
+
+      <div class="ticket-card">
+        <div class="notch-left ticket-notch"></div>
+        <div class="notch-right ticket-notch"></div>
+
+        <div class="ticket-top">
+          <div class="ticket-route">
+            <div class="ticket-stop">
+              <div class="ticket-stop-code">CST</div>
+              <div class="ticket-stop-name">Central Station</div>
+            </div>
+            <div class="ticket-route-mid">
+              <div class="route-line-thin"></div>
+              <div class="route-bus-icon">🚌</div>
+              <div class="route-line-thin"></div>
+            </div>
+            <div class="ticket-stop" style="text-align:right;">
+              <div class="ticket-stop-code">APT</div>
+              <div class="ticket-stop-name">Airport Terminal</div>
+            </div>
+          </div>
+          <div class="ticket-meta">
+            <div class="ticket-meta-item">
+              <div class="ticket-meta-label">Bus</div>
+              <div class="ticket-meta-value">42</div>
+            </div>
+            <div class="ticket-meta-item">
+              <div class="ticket-meta-label">Date</div>
+              <div class="ticket-meta-value">Today</div>
+            </div>
+            <div class="ticket-meta-item">
+              <div class="ticket-meta-label">Passengers</div>
+              <div class="ticket-meta-value" id="s5Passengers">1</div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="ticket-divider">
+
+        <div class="ticket-bottom">
+          <div class="qr-container">
+            <!-- SVG QR Code pattern -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <rect width="100" height="100" fill="white"/>
+              <!-- Top-left finder pattern -->
+              <rect x="5" y="5" width="25" height="25" fill="none" stroke="#1E1E1E" stroke-width="3"/>
+              <rect x="10" y="10" width="15" height="15" fill="#1E1E1E"/>
+              <!-- Top-right finder pattern -->
+              <rect x="70" y="5" width="25" height="25" fill="none" stroke="#1E1E1E" stroke-width="3"/>
+              <rect x="75" y="10" width="15" height="15" fill="#1E1E1E"/>
+              <!-- Bottom-left finder pattern -->
+              <rect x="5" y="70" width="25" height="25" fill="none" stroke="#1E1E1E" stroke-width="3"/>
+              <rect x="10" y="75" width="15" height="15" fill="#1E1E1E"/>
+              <!-- Data modules (random pattern) -->
+              <rect x="35" y="5" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="45" y="5" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="55" y="5" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="35" y="15" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="55" y="15" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="40" y="25" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="50" y="25" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="35" y="35" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="45" y="35" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="60" y="35" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="70" y="35" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="80" y="35" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="90" y="35" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="5" y="40" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="15" y="40" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="25" y="40" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="40" y="40" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="55" y="40" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="65" y="40" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="85" y="40" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="5" y="50" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="20" y="50" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="35" y="50" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="50" y="50" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="60" y="50" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="75" y="50" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="90" y="50" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="10" y="60" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="25" y="60" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="40" y="60" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="55" y="60" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="70" y="60" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="85" y="60" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="35" y="70" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="45" y="70" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="60" y="70" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="75" y="70" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="90" y="70" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="35" y="80" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="50" y="80" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="65" y="80" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="80" y="80" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="40" y="90" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="55" y="90" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="70" y="90" width="5" height="5" fill="#1E1E1E"/>
+              <rect x="85" y="90" width="5" height="5" fill="#1E1E1E"/>
+            </svg>
+          </div>
+          <div class="ticket-id">TKT-2026-RDE-78421</div>
+        </div>
+      </div>
+
+      <div class="s5-actions">
+        <button class="action-btn btn-primary" onclick="downloadTicket()">
+          📥 Save Ticket
+        </button>
+        <button class="action-btn btn-secondary" onclick="goTo('s1')">
+          🏠 Book Another
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav dots -->
+  <div class="nav-dots">
+    <div class="nav-dot active" id="dot0"></div>
+    <div class="nav-dot" id="dot1"></div>
+    <div class="nav-dot" id="dot2"></div>
+    <div class="nav-dot" id="dot3"></div>
+    <div class="nav-dot" id="dot4"></div>
+  </div>
+
+</div>
+
+<div class="info-text">Click any button to navigate between screens · Built for RideEasy UI/UX Competition</div>
+</div>
+
+<script>
+  const screens = ['s1','s2','s3','s4','s5'];
+  let counts = { adult: 1, child: 0, senior: 0 };
+  const prices = { adult: 45, child: 22, senior: 27 };
+
+  function goTo(id) {
+    document.querySelector('.screen.active').classList.remove('active');
+    const next = document.getElementById(id);
+    next.classList.remove('back');
+    next.classList.add('active');
+    updateDots(screens.indexOf(id));
+    updateSummary();
+  }
+
+  function goBack(id) {
+    document.querySelector('.screen.active').classList.remove('active');
+    const prev = document.getElementById(id);
+    prev.classList.add('back');
+    prev.classList.add('active');
+    updateDots(screens.indexOf(id));
+  }
+
+  function updateDots(idx) {
+    screens.forEach((_,i) => {
+      document.getElementById('dot'+i).classList.toggle('active', i === idx);
+    });
+  }
+
+  function selectTransport(el) {
+    document.querySelectorAll('.transport-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function selectDest(el, icon, name) {
+    document.querySelectorAll('.suggest-card').forEach(c => c.classList.remove('selected'));
+    el.style.borderColor = 'var(--blue)';
+    el.style.background = 'var(--blue-light)';
+  }
+
+  function selectToggle(el) {
+    el.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function selectPay(el) {
+    document.querySelectorAll('.pay-option').forEach(p => {
+      p.classList.remove('active');
+      p.querySelector('.pay-check').textContent = '';
+    });
+    el.classList.add('active');
+    el.querySelector('.pay-check').textContent = '✓';
+  }
+
+  function changeCount(type, delta) {
+    counts[type] = Math.max(0, counts[type] + delta);
+    if (type === 'adult' && counts[type] < 1) counts[type] = 1;
+    document.getElementById(type+'Count').textContent = counts[type];
+    updatePrice();
+  }
+
+  function updatePrice() {
+    const total = counts.adult * prices.adult + counts.child * prices.child + counts.senior * prices.senior;
+    document.getElementById('totalPrice').textContent = '₹' + total;
+  }
+
+  function updateSummary() {
+    const total = counts.adult * prices.adult + counts.child * prices.child + counts.senior * prices.senior;
+    const parts = [];
+    if (counts.adult > 0) parts.push(counts.adult + ' Adult');
+    if (counts.child > 0) parts.push(counts.child + ' Child');
+    if (counts.senior > 0) parts.push(counts.senior + ' Senior');
+    const pStr = parts.join(', ');
+    const s4p = document.getElementById('s4Passengers');
+    const s5p = document.getElementById('s5Passengers');
+    if (s4p) s4p.textContent = pStr;
+    if (s5p) s5p.textContent = counts.adult + counts.child + counts.senior;
+    const s4t = document.getElementById('s4Total');
+    if (s4t) s4t.textContent = '₹' + total;
+  }
+
+  function downloadTicket() {
+    const btn = event.target;
+    btn.textContent = '✅ Ticket Saved!';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => {
+      btn.textContent = '📥 Save Ticket';
+      btn.style.background = '';
+    }, 2000);
+  }
+
+  // Build date chips
+  function buildDates() {
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const today = new Date();
+    const row = document.getElementById('dateRow');
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const chip = document.createElement('div');
+      chip.className = 'date-chip' + (i === 0 ? ' active' : '');
+      chip.innerHTML = `<span class="day">${i === 0 ? 'Today' : days[d.getDay()]}</span><span class="num">${d.getDate()}</span>`;
+      chip.onclick = function() {
+        document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+      };
+      row.appendChild(chip);
+    }
+  }
+
+  buildDates();
+  updatePrice();
+</script>
+</body>
+</html>
